@@ -1,36 +1,45 @@
 pipeline {
     agent any
 
-    triggers {
-        cron('*/5 * * * *') // Corrected cron expression
-    }
-
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
         stage('Build') {
             steps {
                 echo "Building.."
                 sh '''
                 cd myapp
-                pip install -r requirments.txt
+                pip install -r requirements.txt
                 '''
             }
         }
+
         stage('Test') {
             steps {
                 echo "Testing.."
                 sh '''
-                python3 hellow.py
-                python3 hello.py --name=siddharth
+                cd myapp
+                pytest
                 '''
             }
         }
+
         stage('Deliver') {
             steps {
-                echo 'Deliver....'
-                sh '''
-                echo "doing delivery stuff.."
-                '''
+                echo 'Delivering....'
+                // Add steps to deploy or deliver your application
             }
+        }
+    }
+    
+    post {
+        failure {
+            echo "Pipeline failed"
+            // Add any cleanup or notification steps on failure
         }
     }
 }

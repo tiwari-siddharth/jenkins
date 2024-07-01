@@ -1,19 +1,23 @@
 pipeline {
     agent any
 
+    environment {
+        PYTHON_HOME = tool name: 'Python3', type: 'hudson.plugins.python.PythonInstallation'
+    }
+
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        
+
         stage('Build') {
             steps {
                 echo "Building.."
                 sh '''
                 cd myapp
-                pip install -r requirements.txt
+                ${PYTHON_HOME}/bin/pip install -r requirements.txt
                 '''
             }
         }
@@ -23,7 +27,7 @@ pipeline {
                 echo "Testing.."
                 sh '''
                 cd myapp
-                pytest
+                ${PYTHON_HOME}/bin/python -m pytest
                 '''
             }
         }
@@ -35,7 +39,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         failure {
             echo "Pipeline failed"

@@ -1,50 +1,36 @@
 pipeline {
     agent any
-            
-
-    environment {
-        PYTHON_HOME = tool name: 'Python3', type: 'hudson.plugins.python.PythonInstallation'
+      }
+    triggers {
+        pollSCM '* * * * *'
     }
-
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Build') {
             steps {
                 echo "Building.."
                 sh '''
                 cd myapp
-                ${PYTHON_HOME}/bin/pip install -r requirements.txt
+                pip install -r requirements.txt
                 '''
             }
         }
-
         stage('Test') {
             steps {
                 echo "Testing.."
                 sh '''
                 cd myapp
-                ${PYTHON_HOME}/bin/python -m pytest
+                python3 hello.py
+                python3 hello.py --name=Brad
                 '''
             }
         }
-
         stage('Deliver') {
             steps {
-                echo 'Delivering....'
-                // Add steps to deploy or deliver your application
+                echo 'Deliver....'
+                sh '''
+                echo "doing delivery stuff.."
+                '''
             }
-        }
-    }
-
-    post {
-        failure {
-            echo "Pipeline failed"
-            // Add any cleanup or notification steps on failure
         }
     }
 }

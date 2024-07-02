@@ -4,11 +4,6 @@ pipeline {
             label 'docker-agent-python'
         }
     } 
-
-    environment {
-        PYTHON_HOME = tool name: 'Python3', type: 'hudson.plugins.python.PythonInstallation'
-    }
-
     stages {
         stage('Checkout') {
             steps {

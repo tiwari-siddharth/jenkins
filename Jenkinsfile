@@ -1,20 +1,28 @@
 pipeline {
     agent any
+    environment {
+        CONTAINER_NAME = '6e95b6c95567'
+    }
     stages {
-        stage("build") {
+        stage('Install JDK in Container') {
             steps {
-                echo 'building the application....'
+                script {
+                    sh "docker exec ${env.CONTAINER_NAME} apt-get update && apt-get install -y openjdk-11-jdk"
+                }
             }
-          }
-         stage("test"){
-              steps {
-                echo 'testing the application....'
+        }
+        stage('Check Java Version in Container') {
+            steps {
+                script {
+                    // Check Java version in the running container
+                    sh "docker exec ${env.CONTAINER_NAME} java -version"
                 }
-          }
-         stage("deploy") {
-                steps {
-                  echo 'deploying the application...'
-                }
-         } 
+            }
+    }
+        }
+    post {
+        always {
+            echo 'Pipeline execution completed'
+        }
     }
 }

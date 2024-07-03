@@ -12,7 +12,7 @@ pipeline {
                 echo "Building.."
                 sh '''
                 cd myapp
-                ${PYTHON_HOME}/bin/pip install -r requirements.txt
+                python3 /bin/pip3 install -r requirements.txt
                 '''
             }
         }
@@ -22,7 +22,7 @@ pipeline {
                 echo "Testing.."
                 sh '''
                 cd myapp
-                ${PYTHON_HOME}/bin/python -m pytest
+                pyhon3 /bin/python -m pytest
                 '''
             }
         }

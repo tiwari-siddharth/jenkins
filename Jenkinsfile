@@ -7,7 +7,7 @@ pipeline {
         stage('Install JDK in Container') {
             steps {
                 script {
-                    sh "docker exec ${env.CONTAINER_NAME} apt-get update && apt-get install -y openjdk-11-jdk"
+                    sh "sudo docker exec ${env.CONTAINER_NAME} apt-get update && apt-get install -y openjdk-11-jdk"
                 }
             }
         }
@@ -15,7 +15,7 @@ pipeline {
             steps {
                 script {
                     // Check Java version in the running container
-                    sh "docker exec ${env.CONTAINER_NAME} java -version"
+                    sh "sudo docker exec ${env.CONTAINER_NAME} java -version"
                 }
             }
     }

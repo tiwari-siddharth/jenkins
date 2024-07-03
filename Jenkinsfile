@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:latest' // Use Docker image with Docker CLI
+            args '--privileged -v /var/run/docker.sock:/var/run/docker.sock' // Bind Docker socket
+        }
+    }
     environment {
         CONTAINER_NAME = '6e95b6c95567' // Replace with your container name or ID
     }

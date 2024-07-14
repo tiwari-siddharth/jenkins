@@ -1,34 +1,22 @@
+
 pipeline {
-    agent {
-        docker {
-            image 'docker:latest' // Use Docker image with Docker CLI
-            args '--privileged -v /var/run/docker.sock:/var/run/docker.sock' // Bind Docker socket
-        }
-    }
-    environment {
-        CONTAINER_NAME = '6e95b6c95567' // Replace with your container name or ID
-    }
+    agent any
     stages {
-        stage('Install JDK in Container') {
+        stage ('Build') {
             steps {
-                script {
-                    // Install JDK in the running container
-                    sh "docker exec ${CONTAINER_NAME} apt-get update && apt-get install -y openjdk-11-jdk"
-                }
+                sh 'printenv'
+                
             }
         }
-        stage('Check Java Version in Container') {
+        stage ('Publish ECR') {
             steps {
-                script {
-                    // Check Java version in the running container
-                    sh "docker exec ${CONTAINER_NAME} java -version"
-                }
+             withEnv (["AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}","AWS_SECRET_ACCESS_KEY=${env.AWS_ACCESS_KEY_ID}", "AWS_DEFAULT_REGION=${env.AWS_DEFAULT_REGION}"]) {
+                 sh 'docker login -u AWS -p $(aws ecr get-login-password --region us-west-1) 339713160899.dkr.ecr.us-west-1.amazonaws.com
+                 sh 'docker build -t ecr-demoing .'
+                 sh 'docker tag ecr-demoing:""$BUILD_ID"" '
+                 sh  'docker push 339713160899.dkr.ecr.us-west-1.amazonaws.com/apache:""$BUILD_ID"" '
+             }
             }
-        }
-    }
-    post {
-        always {
-            echo 'Pipeline execution completed'
         }
     }
 }

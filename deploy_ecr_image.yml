@@ -1,0 +1,55 @@
+---
+- name: Deploy Docker image from ECR
+  hosts: webservers
+  become: yes
+
+  vars:
+    aws_region: "us-west-1"
+    ecr_repository: "339713160899.dkr.ecr.us-west-1.amazonaws.com/python_app"
+    image_tag: "latest"
+    container_name: "python_app_container"
+
+  tasks:
+    - name: Install dependencies
+      apt:
+        name:
+          - awscli
+          - docker.io
+        state: present
+        update_cache: yes
+
+    - name: Start Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Ensure ~/.aws directory exists
+      file:
+        path: ~/.aws
+        state: directory
+        mode: '0700'
+
+    - name: Copy AWS credentials file
+      copy:
+        src: /path/to/your/.aws/credentials
+        dest: ~/.aws/credentials
+        mode: '0600'
+
+    - name: Login to AWS ECR
+      shell: $(aws ecr get-login-password --region {{ aws_region }}) | docker login --username AWS --password-stdin {{ ecr_repository }}
+      register: login_output
+
+    - name: Pull the Docker image from ECR
+      docker_image:
+        name: "{{ ecr_repository }}"
+        tag: "{{ image_tag }}"
+        source: pull
+
+    - name: Stop and remove existing container if any
+      docker_container:
+        name: "{{ container_name }}"
+        state: absent
+
+    - name: Run the Docker container
+      docker_container
